@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { fromWei } from 'web3-utils';
 
 import { INITIALIZE } from './constants';
+import { initialize as initializeMultisig } from '../../store/multisig/actions';
 
 export function initialize() {
   return async dispatch => {
@@ -19,7 +20,7 @@ export function initialize() {
       const weiBalance = await web3.eth.getBalance(account);
       const ethBalance = fromWei(weiBalance);
       
-      dispatch({
+      await dispatch({
         type: INITIALIZE,
         data: {
           web3,
@@ -28,6 +29,7 @@ export function initialize() {
           balance: ethBalance,
         }
       });
+      dispatch(initializeMultisig());
     } catch (error) {
       console.log(error);
       dispatch({
