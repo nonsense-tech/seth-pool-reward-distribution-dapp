@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { create } from '../../store/multisig/actions';
+import { create } from '../../../store/multisig/actions';
 
 const defaultRecipientsData = `0x79DF43B54c31c72a3d93465bdf72317C751822B3,1000000000000000000\n0x9249fE90Ed0782729532140a2Da4814b5e6C46f1,2000000000000000000`;
-class TransactionPage extends Component {
+class TransactionCreation extends Component {
   state = {
     recipientsData: defaultRecipientsData,
   }
@@ -37,4 +37,4 @@ export default connect(
     account: state.web3connect.account,
   }),
   { create }
-)(TransactionPage);
+)(TransactionCreation);

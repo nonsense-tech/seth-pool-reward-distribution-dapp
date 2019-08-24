@@ -12,15 +12,22 @@ export function initialize() {
     const owners = await instance.methods.getOwners().call();
 
     const transactionCount = Number(await instance.methods.transactionCount().call());
-    const transactions = await Promise.all(
-      [...Array(transactionCount)].map((item, index) => instance.methods.transactions(index).call())
+    let transactions = await Promise.all(
+      [...Array(transactionCount)].map(async (item, index) => {
+        const data = await instance.methods.transactions(index).call();
+        return { ...data, index };
+      })
     );
+    transactions = transactions.filter(item =>
+      item.destination.toLowerCase() === addresses.airdropper.toLowerCase()
+    ).sort((a, b) => b.index - a.index);
     
     dispatch({
         type: INITIALIZE,
         data: {
           instance,
           owners,
+          transactions,
         },
       });
   };
@@ -41,6 +48,14 @@ export function create(recipientsData) {
     });
     const transactionData = airdropper.methods.multisend(addresses.token, recipientsAddresses, recipientsShares).encodeABI();
     await instance.methods.submitTransaction(addresses.airdropper, 0, transactionData).send({ from: account });
+  };
+}
+
+export function confirm(transactionId) {
+  return async (dispatch, getState) => {
+    const instance = getState().multisig.instance;
+    const { account } = getState().web3connect;
+    await instance.methods.confirmTransaction(transactionId).send({ from: account });
   };
 }
 
