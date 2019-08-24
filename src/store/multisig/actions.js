@@ -11,11 +11,22 @@ export function initialize() {
     const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
     const owners = await instance.methods.getOwners().call();
 
-    const transactionCount = Number(await instance.methods.transactionCount().call());
+    const data = await Promise.all([
+      instance.methods.transactionCount().call(),
+      instance.methods.required().call(),
+    ]);
+    const transactionCount = Number(data[0]);
     let transactions = await Promise.all(
       [...Array(transactionCount)].map(async (item, index) => {
-        const data = await instance.methods.transactions(index).call();
-        return { ...data, index };
+        const data = await Promise.all([
+          instance.methods.transactions(index).call(),
+          instance.methods.getConfirmationCount(index).call(),
+        ]);
+        return {
+          index,
+          confirmationCount: Number(data[1]),
+          ...data[0],
+        };
       })
     );
     transactions = transactions.filter(item =>
@@ -28,6 +39,7 @@ export function initialize() {
           instance,
           owners,
           transactions,
+          requiredConfirmationCount: Number(data[1]),
         },
       });
   };

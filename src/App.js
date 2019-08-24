@@ -1,8 +1,13 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
+import './App.scss';
 class App extends Component {
   render() {
-    return this.props.children;
+    return (
+      <div className="container">
+        {this.props.children}
+      </div>
+    );
   }
 }
 

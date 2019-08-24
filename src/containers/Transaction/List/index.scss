@@ -1,0 +1,19 @@
+.table {
+  border-spacing: 0px;
+
+  th, td {
+    padding-right: 10px;
+    text-align: center;
+  }
+  td {
+    padding-top: 3px;
+  }
+  tbody {
+    tr {
+      &:hover {
+        cursor: pointer;
+        background-color: beige;
+      }
+    }
+  }
+}

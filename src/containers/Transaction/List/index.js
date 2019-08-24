@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import './index.scss';
 class TransactionList extends Component {
   render() {
-    const { owners, account, history, transactions } = this.props;
+    const { owners, account, history, transactions, requiredConfirmationCount } = this.props;
     const isOwner = owners.includes(account);
     return (
       <div>
@@ -13,17 +14,23 @@ class TransactionList extends Component {
         {isOwner && <button onClick={() => history.push('/transactions/create')}>Create a new transaction</button>}
         <br />
         <br />
-        <table>
+        <table className="table">
           <thead>
             <tr>
               <th>Index</th>
+              <th>Confirmations</th>
               <th>Executed</th> 
             </tr>
           </thead>
           <tbody>
             {transactions.map((item, index) => 
-              <tr key={index} onClick={() => history.push(`/transactions/${item.index}`)}>
+              <tr
+                key={index}
+                className="table-item"
+                onClick={() => history.push(`/transactions/${item.index}`)}
+              >
                 <td>{index + 1}</td>
+                <td>{item.confirmationCount}/{requiredConfirmationCount}</td>
                 <td>{item.executed ? 'Yes' : 'No'}</td> 
               </tr>
             )}
