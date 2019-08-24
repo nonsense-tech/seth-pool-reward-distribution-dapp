@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import { fromWei } from 'web3-utils';
 
 import { INITIALIZE } from './constants';
-import { initialize as initializeMultisig } from '../../store/multisig/actions';
+import { initialize as initializeMultisig } from '../multisig/actions';
 
 export function initialize() {
   return async dispatch => {
