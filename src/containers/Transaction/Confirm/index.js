@@ -7,7 +7,7 @@ import CsvLoader from '../../../components/CsvLoader';
 import AirdropperABI from '../../../contracts/ABIs/airdropper.json';
 import { confirm } from '../../../store/multisig/actions';
 
-const decoder = new InputDataDecoder(AirdropperABI)
+const decoder = new InputDataDecoder(AirdropperABI);
 
 function compare(array1, array2) {
   const sameSize = array1.length === array2.length;
@@ -21,15 +21,9 @@ class TransactionCreation extends Component {
   onDataLoaded = data => {
     this.setState({ csvData: data });
   }
-  render() {
-    const { owners, account, history, confirm, match, transactions } = this.props;
-    const isOwner = owners.includes(account);
-    if (!isOwner) {
-      history.push('/');
-    }
-
-    const id = match.params.id;
-    const tx = transactions.find(item => item.index === Number(id));
+  match = () => {
+    const id = this.props.match.params.id;
+    const tx = this.props.transactions.find(item => item.index === Number(id));
     const transactionData = decoder.decodeData(tx && tx.data);
     if (!transactionData.inputs[1]) return null;
     const addresses = transactionData.inputs[1].map(item => '0x' + item.toLowerCase());
@@ -42,14 +36,22 @@ class TransactionCreation extends Component {
       recipientsShares.push(item[1]);
     });    
 
-    const ok = compare(addresses, recipientsAddresses) && compare(values, recipientsShares);
+    return compare(addresses, recipientsAddresses) && compare(values, recipientsShares);
+  }
+  render() {
+    const { owners, account, history, confirm, match } = this.props;
+    const isOwner = owners.includes(account);
+    if (!isOwner) {
+      history.push('/');
+    }
+    const id = match.params.id;
     
     return (
       <div>
         <CsvLoader onDataLoaded={this.onDataLoaded} />
         <br />
         <br />
-        <span>{ok ? 'Match' : 'Not match'}</span>
+        <span>{this.match() ? 'Match' : 'Not match'}</span>
         <br />
         <br />
         <button onClick={() => confirm(id)}>Confirm transaction</button>
