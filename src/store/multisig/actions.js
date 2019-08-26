@@ -5,7 +5,7 @@ import addresses from '../../contracts/addresses.json';
 
 export function initialize() {
   return async (dispatch, getState) => {
-    const web3 = getState().web3connect.web3;
+    const { web3, account } = getState().web3connect;
     const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
     const owners = await instance.methods.getOwners().call();
 
@@ -19,10 +19,12 @@ export function initialize() {
         const data = await Promise.all([
           instance.methods.transactions(index).call(),
           instance.methods.getConfirmationCount(index).call(),
+          instance.methods.confirmations(index, account).call(),
         ]);
         return {
           index,
           confirmationCount: Number(data[1]),
+          youConfirmed: data[2],
           ...data[0],
         };
       })

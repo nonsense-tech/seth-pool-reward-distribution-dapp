@@ -17,14 +17,23 @@ class TransactionCreation extends Component {
   state = {
     match: false,
     csvData: [],
+    sending: false,
+    tx: {},
+  }
+  componentDidMount() {
+    const { match, transactions } = this.props;
+    const id = match.params.id;
+    const tx = transactions.find(item => item.index === Number(id));
+    this.setState({ tx });
+  }
+  setSending = bool => {
+    this.setState({ sending: bool });
   }
   onDataLoaded = data => {
     this.setState({ csvData: data });
   }
   match = () => {
-    const id = this.props.match.params.id;
-    const tx = this.props.transactions.find(item => item.index === Number(id));
-    const transactionData = decoder.decodeData(tx && tx.data);
+    const transactionData = decoder.decodeData(this.state.tx && this.state.tx.data);
     if (!transactionData.inputs[1]) return null;
     const addresses = transactionData.inputs[1].map(item => '0x' + item.toLowerCase());
     const values = transactionData.inputs[2].map(item => item.toString());
@@ -38,13 +47,26 @@ class TransactionCreation extends Component {
 
     return compare(addresses, recipientsAddresses) && compare(values, recipientsShares);
   }
+  onConfirm = async () => {
+    this.setSending(true);
+    await this.props.confirm(this.props.match.params.id);
+    this.props.history.push('/transactions');
+    this.setSending(false);
+  }
   render() {
-    const { owners, account, history, confirm, match } = this.props;
+    const { owners, account, history } = this.props;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
     }
-    const id = match.params.id;
+
+    if (this.state.sending) {
+      return <span>Sending...</span>;
+    }
+
+    if (this.state.tx.youConfirmed) {
+      return <span>You have already confirmed the transaction</span>;
+    }
     
     return (
       <div>
@@ -54,7 +76,7 @@ class TransactionCreation extends Component {
         <span>{this.match() ? 'Match' : 'Not match'}</span>
         <br />
         <br />
-        <button onClick={() => confirm(id)}>Confirm transaction</button>
+        <button onClick={this.onConfirm}>Confirm transaction</button>
       </div>
     );
   }
