@@ -42,7 +42,7 @@ class TransactionCreation extends Component {
         <CsvLoader onDataLoaded={this.onDataLoaded} />
         <br />
         <br />
-        <button onClick={this.create}>Send transaction</button>
+        {this.state.data.length > 0 && <button onClick={this.create}>Send transaction</button>}
       </div>
     );
   }
