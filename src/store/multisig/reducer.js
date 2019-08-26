@@ -1,4 +1,4 @@
-import { INITIALIZE } from './constants';
+import { INITIALIZE, SET_TRANSACTIONS } from './constants';
 
 const initState = {
   instance: null,
@@ -10,8 +10,11 @@ const initState = {
 export default function(state = initState, { type, data }) {
   switch (type) {
     case INITIALIZE:
-      const { instance, owners, transactions, requiredConfirmationCount } = data;
-      return { ...state, instance, owners, transactions, requiredConfirmationCount };
+      const { instance, owners, requiredConfirmationCount } = data;
+      return { ...state, instance, owners, requiredConfirmationCount };
+    case SET_TRANSACTIONS:
+      const { transactions } = data;
+      return { ...state, transactions };
     default:
       return state;
   }

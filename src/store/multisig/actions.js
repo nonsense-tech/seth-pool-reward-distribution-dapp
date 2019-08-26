@@ -1,19 +1,33 @@
-import { INITIALIZE } from './constants';
+import { INITIALIZE, SET_TRANSACTIONS } from './constants';
 import MultisigABI from '../../contracts/ABIs/multisig.json';
 import AirdropperABI from '../../contracts/ABIs/airdropper.json';
 import addresses from '../../contracts/addresses.json';
 
 export function initialize() {
   return async (dispatch, getState) => {
-    const { web3, account } = getState().web3connect;
+    const { web3 } = getState().web3connect;
     const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
     const owners = await instance.methods.getOwners().call();
+    const requiredConfirmationCount = Number(await instance.methods.required().call());
+    
+    await dispatch({
+      type: INITIALIZE,
+      data: {
+        instance,
+        owners,
+        requiredConfirmationCount,
+      },
+    });
+    dispatch(loadTransactions());
+  };
+}
 
-    const data = await Promise.all([
-      instance.methods.transactionCount().call(),
-      instance.methods.required().call(),
-    ]);
-    const transactionCount = Number(data[0]);
+export function loadTransactions() {
+  return async (dispatch, getState) => {
+    const { web3, account } = getState().web3connect;
+    const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
+
+    const transactionCount = Number(await instance.methods.transactionCount().call());
     let transactions = await Promise.all(
       [...Array(transactionCount)].map(async (item, index) => {
         const data = await Promise.all([
@@ -32,17 +46,12 @@ export function initialize() {
     transactions = transactions.filter(item =>
       item.destination.toLowerCase() === addresses.airdropper.toLowerCase()
     ).sort((a, b) => b.index - a.index);
-    
+
     dispatch({
-        type: INITIALIZE,
-        data: {
-          instance,
-          owners,
-          transactions,
-          requiredConfirmationCount: Number(data[1]),
-        },
-      });
-  };
+      type: SET_TRANSACTIONS,
+      data: { transactions },
+    });
+  }
 }
 
 export function create(data) {
@@ -67,6 +76,7 @@ export function confirm(transactionId) {
     const instance = getState().multisig.instance;
     const { account } = getState().web3connect;
     await instance.methods.confirmTransaction(transactionId).send({ from: account });
+    dispatch(loadTransactions());
   };
 }
 
@@ -75,6 +85,7 @@ export function execute(transactionId) {
     const instance = getState().multisig.instance;
     const { account } = getState().web3connect;
     await instance.methods.executeTransaction(transactionId).send({ from: account });
+    dispatch(loadTransactions());
   };
 }
 
