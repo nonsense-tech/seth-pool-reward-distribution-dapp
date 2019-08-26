@@ -1,31 +1,55 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import papaparse from 'papaparse';
 
 import { create } from '../../../store/multisig/actions';
 
-const defaultRecipientsData = `0x79DF43B54c31c72a3d93465bdf72317C751822B3,1000000000000000000\n0x9249fE90Ed0782729532140a2Da4814b5e6C46f1,2000000000000000000`;
 class TransactionCreation extends Component {
   state = {
-    recipientsData: defaultRecipientsData,
+    data: [],
+    sending: false,
   }
-  onRecipientsDataChange = e => {
-    this.setState({
-      recipientsData: e.target.value,
-    });
+  setSending = bool => {
+    this.setState({ sending: bool });
+  }
+  onFileChange = event => {
+    const fileReader = new FileReader();
+    fileReader.onloadend = e => {
+      const data = papaparse.parse(
+        e.target.result,
+        { delimiter: ',', header: false, skipEmptyLines: true }
+      ).data;
+      this.setState({ data });
+    }
+    if (event.target.files[0]) {
+      fileReader.readAsText(event.target.files[0]);
+    } else {
+      this.setState({ data: [] });
+    }
+  }
+  onCreate = async () => {
+    this.setSending(true);
+    await this.props.create(this.state.data);
+    this.props.history.push('/transactions');
+    this.setSending(false);
   }
   render() {
-    const { owners, account, history, create } = this.props;
+    const { owners, account, history } = this.props;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
     }
+
+    if (this.state.sending) {
+      return <span>Sending...</span>;
+    }
     
     return (
       <div>
-        <textarea style={{ width: 500, height: 200 }} value={this.state.recipientsData} onChange={this.onRecipientsDataChange}></textarea>
+        <input type="file" name="file" accept=".csv" onChange={this.onFileChange}/>
         <br />
         <br />
-        <button onClick={() => create(this.state.recipientsData)}>Send transaction</button>
+        <button onClick={this.onCreate}>Send transaction</button>
       </div>
     );
   }

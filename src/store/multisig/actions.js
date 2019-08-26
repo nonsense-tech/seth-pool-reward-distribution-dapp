@@ -45,16 +45,15 @@ export function initialize() {
   };
 }
 
-export function create(recipientsData) {
+export function create(data) {
   return async (dispatch, getState) => {
     const instance = getState().multisig.instance;
     const { web3, account } = getState().web3connect;
     const airdropper = new web3.eth.Contract(AirdropperABI, addresses.airdropper);
 
-    const parsedData = papaparse.parse(recipientsData, { delimiter: ',', header: false, skipEmptyLines: true }).data;
     const recipientsAddresses = [];
     const recipientsShares = [];
-    parsedData.forEach(item => {
+    data.forEach(item => {
       recipientsAddresses.push(item[0]);
       recipientsShares.push(item[1]);
     });
