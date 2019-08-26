@@ -5,7 +5,7 @@ import InputDataDecoder from 'ethereum-input-data-decoder';
 import CsvLoader from '../../../components/CsvLoader';
 
 import AirdropperABI from '../../../contracts/ABIs/airdropper.json';
-import { confirm } from '../../../store/multisig/actions';
+import { confirm, execute } from '../../../store/multisig/actions';
 
 const decoder = new InputDataDecoder(AirdropperABI);
 
@@ -47,25 +47,44 @@ class TransactionCreation extends Component {
 
     return compare(addresses, recipientsAddresses) && compare(values, recipientsShares);
   }
-  onConfirm = async () => {
+  call = async promise => {
     this.setSending(true);
-    await this.props.confirm(this.props.match.params.id);
+    await promise;
     this.props.history.push('/transactions');
     this.setSending(false);
   }
+  confirm = () => {
+    const promise = this.props.confirm(this.props.match.params.id);
+    this.call(promise);
+  }
+  execute = () => {
+    const promise = this.props.execute(this.props.match.params.id);
+    this.call(promise);
+  }
   render() {
     const { owners, account, history } = this.props;
+    const { tx, sending } = this.state;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
     }
 
-    if (this.state.sending) {
+    if (sending) {
       return <span>Sending...</span>;
     }
 
-    if (this.state.tx.youConfirmed) {
-      return <span>You have already confirmed the transaction</span>;
+    if (tx.youConfirmed) {
+      let executeButton = null;
+      if (!tx.executed && tx.confirmationCount >= this.props.requiredConfirmationCount) {
+        executeButton = <button onClick={this.execute}>Execute transaction</button>;
+      }
+      return (
+        <div>
+          <p>You have already confirmed the transaction</p>
+          {executeButton}
+        </div>
+        
+      );
     }
     
     return (
@@ -76,7 +95,7 @@ class TransactionCreation extends Component {
         <span>{this.match() ? 'Match' : 'Not match'}</span>
         <br />
         <br />
-        <button onClick={this.onConfirm}>Confirm transaction</button>
+        <button onClick={this.confirm}>Confirm transaction</button>
       </div>
     );
   }
@@ -87,5 +106,5 @@ export default connect(
     ...state.multisig,
     account: state.web3connect.account,
   }),
-  { confirm }
+  { confirm, execute }
 )(TransactionCreation);

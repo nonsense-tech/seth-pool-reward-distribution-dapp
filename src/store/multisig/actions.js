@@ -70,3 +70,11 @@ export function confirm(transactionId) {
   };
 }
 
+export function execute(transactionId) {
+  return async (dispatch, getState) => {
+    const instance = getState().multisig.instance;
+    const { account } = getState().web3connect;
+    await instance.methods.executeTransaction(transactionId).send({ from: account });
+  };
+}
+
