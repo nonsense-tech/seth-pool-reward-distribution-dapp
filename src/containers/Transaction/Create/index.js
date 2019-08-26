@@ -16,10 +16,14 @@ class TransactionCreation extends Component {
   onDataLoaded = data => {
       this.setState({ data });
   }
-  onCreate = async () => {
+  create = async () => {
     this.setSending(true);
-    await this.props.create(this.state.data);
-    this.props.history.push('/transactions');
+    try {
+      await this.props.create(this.state.data);
+      this.props.history.push('/transactions');
+    } catch (error) {
+      console.log(error);
+    }
     this.setSending(false);
   }
   render() {
@@ -38,7 +42,7 @@ class TransactionCreation extends Component {
         <CsvLoader onDataLoaded={this.onDataLoaded} />
         <br />
         <br />
-        <button onClick={this.onCreate}>Send transaction</button>
+        <button onClick={this.create}>Send transaction</button>
       </div>
     );
   }

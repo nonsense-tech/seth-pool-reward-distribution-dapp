@@ -49,8 +49,12 @@ class TransactionCreation extends Component {
   }
   call = async promise => {
     this.setSending(true);
-    await promise;
-    this.props.history.push('/transactions');
+    try {
+      await promise;
+      this.props.history.push('/transactions');
+    } catch (error) {
+      console.log(error);
+    }
     this.setSending(false);
   }
   confirm = () => {
