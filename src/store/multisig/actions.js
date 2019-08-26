@@ -1,5 +1,3 @@
-import papaparse from 'papaparse';
-
 import { INITIALIZE } from './constants';
 import MultisigABI from '../../contracts/ABIs/multisig.json';
 import AirdropperABI from '../../contracts/ABIs/airdropper.json';

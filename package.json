@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ethereum-input-data-decoder": "^0.2.0",
     "node-sass": "^4.12.0",
     "papaparse": "^5.0.2",
     "react": "^16.9.0",
