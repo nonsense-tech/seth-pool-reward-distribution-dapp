@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import papaparse from 'papaparse';
+
+import CsvLoader from '../../../components/CsvLoader';
 
 import { create } from '../../../store/multisig/actions';
 
@@ -12,20 +13,8 @@ class TransactionCreation extends Component {
   setSending = bool => {
     this.setState({ sending: bool });
   }
-  onFileChange = event => {
-    const fileReader = new FileReader();
-    fileReader.onloadend = e => {
-      const data = papaparse.parse(
-        e.target.result,
-        { delimiter: ',', header: false, skipEmptyLines: true }
-      ).data;
+  onDataLoaded = data => {
       this.setState({ data });
-    }
-    if (event.target.files[0]) {
-      fileReader.readAsText(event.target.files[0]);
-    } else {
-      this.setState({ data: [] });
-    }
   }
   onCreate = async () => {
     this.setSending(true);
@@ -46,7 +35,7 @@ class TransactionCreation extends Component {
     
     return (
       <div>
-        <input type="file" name="file" accept=".csv" onChange={this.onFileChange}/>
+        <CsvLoader onDataLoaded={this.onDataLoaded} />
         <br />
         <br />
         <button onClick={this.onCreate}>Send transaction</button>

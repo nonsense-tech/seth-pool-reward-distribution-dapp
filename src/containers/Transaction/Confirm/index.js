@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InputDataDecoder from 'ethereum-input-data-decoder';
-import papaparse from 'papaparse';
+
+import CsvLoader from '../../../components/CsvLoader';
 
 import AirdropperABI from '../../../contracts/ABIs/airdropper.json';
 import { confirm } from '../../../store/multisig/actions';
@@ -17,20 +18,8 @@ class TransactionCreation extends Component {
     match: false,
     csvData: [],
   }
-  onFileChange = event => {
-    const fileReader = new FileReader();
-    fileReader.onloadend = e => {
-      const data = papaparse.parse(
-        e.target.result,
-        { delimiter: ',', header: false, skipEmptyLines: true }
-      ).data;
-      this.setState({ csvData: data });
-    }
-    if (event.target.files[0]) {
-      fileReader.readAsText(event.target.files[0]);
-    } else {
-      this.setState({ csvData: [] });
-    }
+  onDataLoaded = data => {
+    this.setState({ csvData: data });
   }
   render() {
     const { owners, account, history, confirm, match, transactions } = this.props;
@@ -57,7 +46,7 @@ class TransactionCreation extends Component {
     
     return (
       <div>
-        <input type="file" name="file" accept=".csv" onChange={this.onFileChange}/>
+        <CsvLoader onDataLoaded={this.onDataLoaded} />
         <br />
         <br />
         <span>{ok ? 'Match' : 'Not match'}</span>
