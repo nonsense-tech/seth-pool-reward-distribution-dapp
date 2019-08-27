@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Icon, Button } from 'antd';
+import { Table, Icon, Button, Typography } from 'antd';
 
 import './index.scss';
 
 const { Column } = Table;
+const { Text } = Typography;
 
 class TransactionList extends Component {
   render() {
@@ -26,11 +27,21 @@ class TransactionList extends Component {
           dataSource={transactions.map((item, index) => ({
             key: index,
             transactionId: item.id,
-            confirmations: `${item.confirmationCount}/${requiredConfirmationCount}`,
+            confirmations: (
+              item.confirmationCount >= requiredConfirmationCount
+              ? <Icon type="check" style={{ color: 'green' }} />
+              : `${item.confirmationCount}/${requiredConfirmationCount}`
+            ),
             executed: (
               <Icon
                 type={item.executed ? 'check' : 'close'}
                 style={{ color: item.executed ? 'green' : 'red' }}
+              />
+            ),
+            yourConfirmation: (
+              <Icon
+                type={item.youConfirmed ? 'check' : 'close'}
+                style={{ color: item.youConfirmed ? 'green' : 'red' }}
               />
             ),
           }))}
@@ -38,6 +49,7 @@ class TransactionList extends Component {
         >
           <Column title="ID" dataIndex="transactionId" align="center" />
           <Column title="Confirmations" dataIndex="confirmations" align="center" />
+          <Column title="Your confirmation" dataIndex="yourConfirmation" align="center" />
           <Column title="Executed" dataIndex="executed" align="center" />
         </Table>
       </div>
