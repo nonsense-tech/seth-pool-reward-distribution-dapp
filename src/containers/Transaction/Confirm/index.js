@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InputDataDecoder from 'ethereum-input-data-decoder';
+import { Button, Typography, Row, Col, Tag } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
 
 import AirdropperABI from '../../../contracts/ABIs/airdropper.json';
 import { confirm, execute } from '../../../store/multisig/actions';
+
+import './index.scss';
+
+const { Text } = Typography;
 
 const decoder = new InputDataDecoder(AirdropperABI);
 
@@ -73,34 +78,58 @@ class TransactionCreation extends Component {
       history.push('/');
     }
 
-    if (sending) {
-      return <span>Sending...</span>;
-    }
-
     if (tx.youConfirmed) {
       let executeButton = null;
       if (!tx.executed && tx.confirmationCount >= this.props.requiredConfirmationCount) {
-        executeButton = <button onClick={this.execute}>Execute transaction</button>;
+        executeButton = (
+          <Button
+            className="execute-button"
+            type="primary"
+            onClick={this.execute}
+            loading={sending}
+          >
+            Execute transaction
+          </Button>
+        );
       }
       return (
         <div>
-          <p>You have already confirmed the transaction</p>
-          {executeButton}
+          <Text>You have already confirmed the transaction</Text>
+          <Row>
+            {executeButton}
+          </Row>
         </div>
         
       );
     }
-    
+
+    const match = this.match();
+    const csvLoaded = this.state.csvData.length > 0;
     return (
-      <div>
-        <CsvLoader onDataLoaded={this.onDataLoaded} />
-        <br />
-        <br />
-        <span>{this.match() ? 'Match' : 'Not match'}</span>
-        <br />
-        <br />
-        <button onClick={this.confirm}>Confirm transaction</button>
-      </div>
+      <Col>
+        <Text>Upload your CSV to compare with transaction data</Text>
+        <Row className="match-row" align="middle" type="flex">
+          <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
+          <div className="status-badge">
+            {csvLoaded ? (
+              match ? (
+                <Tag color="green">MATCH</Tag>
+              ) : (
+                <Tag color="red">NOT MATCH</Tag>
+              )
+            ) : (
+              <Tag>NOT VERIFIED</Tag>
+            )}
+          </div>
+        </Row>
+        <Button
+          type="primary"
+          onClick={this.confirm}
+          loading={sending}
+        >
+          Confirm transaction
+        </Button>
+      </Col>
     );
   }
 }

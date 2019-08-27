@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Button } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
 
 import { create } from '../../../store/multisig/actions';
+
+import './index.scss';
 
 class TransactionCreation extends Component {
   state = {
@@ -28,21 +31,25 @@ class TransactionCreation extends Component {
   }
   render() {
     const { owners, account, history } = this.props;
+    const { sending } = this.state;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
     }
-
-    if (this.state.sending) {
-      return <span>Sending...</span>;
-    }
     
     return (
       <div>
-        <CsvLoader onDataLoaded={this.onDataLoaded} />
-        <br />
-        <br />
-        {this.state.data.length > 0 && <button onClick={this.create}>Send transaction</button>}
+        <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
+        {this.state.data.length > 0 && (
+          <Button
+            className="create-button"
+            type="primary"
+            onClick={this.create}
+            loading={sending}
+          >
+            Send transaction
+          </Button>
+        )}
       </div>
     );
   }

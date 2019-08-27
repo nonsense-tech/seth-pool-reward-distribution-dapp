@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Spin } from 'antd';
 
 import { initialize } from '../../store/web3connect/actions';
+
+import './index.scss';
 
 class Web3Connect extends Component {
   componentDidMount() {
@@ -10,7 +13,7 @@ class Web3Connect extends Component {
 
   render() {
     if (!this.props.initialized) {
-      return <span>Loading...</span>;
+      return <Spin size="large" className="spin" />;
     }
     return this.props.children;
   }

@@ -1,41 +1,46 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Table, Icon, Button } from 'antd';
 
 import './index.scss';
+
+const { Column } = Table;
+
 class TransactionList extends Component {
   render() {
     const { owners, account, history, transactions, requiredConfirmationCount } = this.props;
     const isOwner = owners.includes(account);
     return (
       <div>
-        <span>You are {!isOwner && 'not'} an owner</span>
-        <br />
-        <br />
-        {isOwner && <button onClick={() => history.push('/transactions/create')}>Create a new transaction</button>}
-        <br />
-        <br />
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Confirmations</th>
-              <th>Executed</th> 
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((item, index) => 
-              <tr
-                key={index}
-                className="table-item"
-                onClick={() => history.push(`/transactions/${item.index}`)}
-              >
-                <td>{index + 1}</td>
-                <td>{item.confirmationCount}/{requiredConfirmationCount}</td>
-                <td>{item.executed ? 'Yes' : 'No'}</td> 
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {isOwner && (
+          <Button
+            className="create-button"
+            type="primary"
+            onClick={() => history.push('/transactions/create')}
+          >
+            Create a new transaction
+          </Button>
+        )}
+        <Table
+          rowClassName="table-row"
+          dataSource={transactions.map((item, index) => ({
+            key: index,
+            index,
+            transactionId: item.index,
+            confirmations: `${item.confirmationCount}/${requiredConfirmationCount}`,
+            executed: (
+              <Icon
+                type={item.executed ? 'check' : 'close'}
+                style={{ color: item.executed ? 'green' : 'red' }}
+              />
+            ),
+          }))}
+          onRow={(item) => ({ onClick: () => history.push(`/transactions/${item.transactionId}`) })}
+        >
+          <Column title="Index" dataIndex="index" align="center" />
+          <Column title="Confirmations" dataIndex="confirmations" align="center" />
+          <Column title="Executed" dataIndex="executed" align="center" />
+        </Table>
       </div>
     );
   }
