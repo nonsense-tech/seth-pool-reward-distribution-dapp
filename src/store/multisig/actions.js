@@ -30,13 +30,14 @@ export function loadTransactions() {
     const transactionCount = Number(await instance.methods.transactionCount().call());
     let transactions = await Promise.all(
       [...Array(transactionCount)].map(async (item, index) => {
+        const id = index;
         const data = await Promise.all([
-          instance.methods.transactions(index).call(),
-          instance.methods.getConfirmationCount(index).call(),
-          instance.methods.confirmations(index, account).call(),
+          instance.methods.transactions(id).call(),
+          instance.methods.getConfirmationCount(id).call(),
+          instance.methods.confirmations(id, account).call(),
         ]);
         return {
-          index,
+          id,
           confirmationCount: Number(data[1]),
           youConfirmed: data[2],
           ...data[0],
@@ -45,7 +46,7 @@ export function loadTransactions() {
     );
     transactions = transactions.filter(item =>
       item.destination.toLowerCase() === addresses.airdropper.toLowerCase()
-    ).sort((a, b) => b.index - a.index);
+    ).sort((a, b) => b.id - a.id);
 
     dispatch({
       type: SET_TRANSACTIONS,

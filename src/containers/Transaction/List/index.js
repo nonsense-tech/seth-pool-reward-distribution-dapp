@@ -25,8 +25,7 @@ class TransactionList extends Component {
           rowClassName="table-row"
           dataSource={transactions.map((item, index) => ({
             key: index,
-            index,
-            transactionId: item.index,
+            transactionId: item.id,
             confirmations: `${item.confirmationCount}/${requiredConfirmationCount}`,
             executed: (
               <Icon
@@ -37,7 +36,7 @@ class TransactionList extends Component {
           }))}
           onRow={(item) => ({ onClick: () => history.push(`/transactions/${item.transactionId}`) })}
         >
-          <Column title="Index" dataIndex="index" align="center" />
+          <Column title="ID" dataIndex="transactionId" align="center" />
           <Column title="Confirmations" dataIndex="confirmations" align="center" />
           <Column title="Executed" dataIndex="executed" align="center" />
         </Table>

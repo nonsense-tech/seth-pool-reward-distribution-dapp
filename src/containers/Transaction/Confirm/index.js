@@ -28,7 +28,7 @@ class TransactionCreation extends Component {
   componentDidMount() {
     const { match, transactions } = this.props;
     const id = match.params.id;
-    const tx = transactions.find(item => item.index === Number(id));
+    const tx = transactions.find(item => item.id === Number(id));
     this.setState({ tx });
   }
   setSending = bool => {
