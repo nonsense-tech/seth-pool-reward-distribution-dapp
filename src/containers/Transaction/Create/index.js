@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button } from 'antd';
+import { Button, Table } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
 
@@ -31,7 +31,7 @@ class TransactionCreation extends Component {
   }
   render() {
     const { owners, account, history } = this.props;
-    const { sending } = this.state;
+    const { sending, data } = this.state;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
@@ -40,7 +40,7 @@ class TransactionCreation extends Component {
     return (
       <div>
         <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
-        {this.state.data.length > 0 && (
+        {data.length > 0 && (
           <Button
             className="create-button"
             type="primary"
@@ -49,6 +49,27 @@ class TransactionCreation extends Component {
           >
             Send transaction
           </Button>
+        )}
+        {data.length > 0 && (
+          <Table
+            size="small"
+            pagination={false}
+            dataSource={data.map((item, index) => ({
+              key: index,
+              address: item[0],
+              value: item[1],
+            }))}
+            columns={[
+              {
+                title: 'Address',
+                dataIndex: 'address',
+              },
+              {
+                title: 'Value',
+                dataIndex: 'value',
+              }
+            ]}
+          />
         )}
       </div>
     );
