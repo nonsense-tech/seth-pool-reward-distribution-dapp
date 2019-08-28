@@ -1,4 +1,4 @@
-import { INITIALIZE, SET_TRANSACTIONS } from './constants';
+import { INITIALIZE, SET_TRANSACTIONS, SET_INITIALIZED } from './constants';
 import MultisigABI from '../../contracts/ABIs/multisig.json';
 import AirdropperABI from '../../contracts/ABIs/airdropper.json';
 import addresses from '../../contracts/addresses.json';
@@ -18,7 +18,8 @@ export function initialize() {
         requiredConfirmationCount,
       },
     });
-    dispatch(loadTransactions());
+    await dispatch(loadTransactions());
+    await dispatch({ type: SET_INITIALIZED });
   };
 }
 

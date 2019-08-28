@@ -1,10 +1,11 @@
-import { INITIALIZE, SET_TRANSACTIONS } from './constants';
+import { INITIALIZE, SET_TRANSACTIONS, SET_INITIALIZED } from './constants';
 
 const initState = {
   instance: null,
   owners: [],
   transactions: [],
   requiredConfirmationCount: 0,
+  initialized: false,
 };
 
 export default function(state = initState, { type, data }) {
@@ -12,6 +13,8 @@ export default function(state = initState, { type, data }) {
     case INITIALIZE:
       const { instance, owners, requiredConfirmationCount } = data;
       return { ...state, instance, owners, requiredConfirmationCount };
+    case SET_INITIALIZED:
+      return { ...state, initialized: true };
     case SET_TRANSACTIONS:
       const { transactions } = data;
       return { ...state, transactions };

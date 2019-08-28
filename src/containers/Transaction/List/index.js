@@ -51,7 +51,7 @@ class TransactionList extends Component {
         >
           <Column title="ID" dataIndex="transactionId" align="center" />
           <Column title="Confirmations" dataIndex="confirmations" align="center" />
-          <Column title="Your confirmation" dataIndex="yourConfirmation" align="center" />
+          {isOwner && <Column title="Your confirmation" dataIndex="yourConfirmation" align="center" />}
           <Column title="Executed" dataIndex="executed" align="center" />
         </Table>
       </div>

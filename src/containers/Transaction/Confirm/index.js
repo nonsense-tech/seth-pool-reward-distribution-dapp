@@ -82,18 +82,15 @@ class TransactionCreation extends Component {
     this.call(promise);
   }
   render() {
-    const { owners, account, history } = this.props;
+    const { owners, account } = this.props;
     const { tx, sending, txData } = this.state;
     const isOwner = owners.includes(account);
-    if (!isOwner) {
-      history.push('/');
-    }
     
     const match = this.match();
     const csvLoaded = this.state.csvData.length > 0;
     let controls = null;
 
-    if (!tx.executed) {
+    if (!tx.executed && isOwner) {
       if (tx.youConfirmed) {
         let executeButton = null;
         if (tx.confirmationCount >= this.props.requiredConfirmationCount) {
