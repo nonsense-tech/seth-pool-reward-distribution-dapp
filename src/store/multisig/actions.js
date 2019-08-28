@@ -1,4 +1,4 @@
-import { INITIALIZE, SET_TRANSACTIONS, SET_INITIALIZED } from './constants';
+import { INITIALIZE, SET_TRANSACTIONS, SET_INITIALIZED, SET_TRANSACTIONS_LOADING } from './constants';
 import MultisigABI from '../../contracts/ABIs/multisig.json';
 import AirdropperABI from '../../contracts/ABIs/airdropper.json';
 import addresses from '../../contracts/addresses.json';
@@ -14,7 +14,7 @@ export function initialize() {
       type: INITIALIZE,
       data: {
         instance,
-        owners,
+        owners: owners.map(item => item.toLowerCase()),
         requiredConfirmationCount,
       },
     });
@@ -25,6 +25,12 @@ export function initialize() {
 
 export function loadTransactions() {
   return async (dispatch, getState) => {
+    dispatch({
+      type: SET_TRANSACTIONS_LOADING,
+      data: { 
+        loading: true,
+      },
+    });
     const { web3, account } = getState().web3connect;
     const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
 
@@ -52,6 +58,12 @@ export function loadTransactions() {
     dispatch({
       type: SET_TRANSACTIONS,
       data: { transactions },
+    });
+    dispatch({
+      type: SET_TRANSACTIONS_LOADING,
+      data: { 
+        loading: false,
+      },
     });
   }
 }

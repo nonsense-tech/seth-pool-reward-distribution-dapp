@@ -1,8 +1,8 @@
 import Web3 from 'web3';
 import { fromWei } from 'web3-utils';
 
-import { INITIALIZE } from './constants';
-import { initialize as initializeMultisig } from '../multisig/actions';
+import { INITIALIZE, CHANGE_ACCOUNT } from './constants';
+import { initialize as initializeMultisig, loadTransactions } from '../multisig/actions';
 
 export function initialize() {
   return async dispatch => {
@@ -16,16 +16,30 @@ export function initialize() {
       } else {
           throw new Error('No web3 provider reachable.');
       }
-      const account = (await web3.eth.getAccounts())[0];
-      const weiBalance = await web3.eth.getBalance(account);
+      let currentAccount = (await web3.eth.getAccounts())[0].toLowerCase();
+      const weiBalance = await web3.eth.getBalance(currentAccount);
       const ethBalance = fromWei(weiBalance);
+
+      web3.currentProvider.publicConfigStore.on('update', async function(obj) {
+        const account = obj.selectedAddress && obj.selectedAddress.toLowerCase();
+        if (account && account !== currentAccount) {
+          currentAccount = account;
+          await dispatch({
+            type: CHANGE_ACCOUNT,
+            data: {
+              account: currentAccount,
+            }
+          });
+          dispatch(loadTransactions());
+        }
+      });
       
       await dispatch({
         type: INITIALIZE,
         data: {
           web3,
           initialized: true,
-          account,
+          account: currentAccount,
           balance: ethBalance,
         }
       });

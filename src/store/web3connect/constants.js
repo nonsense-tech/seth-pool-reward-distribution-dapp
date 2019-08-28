@@ -1,1 +1,2 @@
 export const INITIALIZE = 'WEB3:INITIALIZE';
+export const CHANGE_ACCOUNT = 'WEB3:CHANGE_ACCOUNT';
