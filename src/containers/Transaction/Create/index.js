@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Button, Table } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
+import DataTable from '../../../components/DataTable';
 
 import { create } from '../../../store/multisig/actions';
 
@@ -50,27 +51,7 @@ class TransactionCreation extends Component {
             Send transaction
           </Button>
         )}
-        {data.length > 0 && (
-          <Table
-            size="small"
-            pagination={false}
-            dataSource={data.map((item, index) => ({
-              key: index,
-              address: item[0],
-              value: item[1],
-            }))}
-            columns={[
-              {
-                title: 'Address',
-                dataIndex: 'address',
-              },
-              {
-                title: 'Value',
-                dataIndex: 'value',
-              }
-            ]}
-          />
-        )}
+        {data.length > 0 && <DataTable data={data} />}
       </div>
     );
   }
