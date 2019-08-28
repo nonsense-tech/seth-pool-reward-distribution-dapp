@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Table } from 'antd';
+import { Button, Row } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
 import DataTable from '../../../components/DataTable';
@@ -40,17 +40,18 @@ class TransactionCreation extends Component {
     
     return (
       <div>
-        <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
-        {data.length > 0 && (
-          <Button
-            className="create-button"
-            type="primary"
-            onClick={this.create}
-            loading={sending}
-          >
-            Send transaction
-          </Button>
-        )}
+        <Row className="button-row" align="middle" type="flex" justify="space-between">
+          <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
+          {data.length > 0 && (
+            <Button
+              type="primary"
+              onClick={this.create}
+              loading={sending}
+            >
+              Send transaction
+            </Button>
+          )}
+        </Row>
         {data.length > 0 && <DataTable data={data} />}
       </div>
     );

@@ -4,6 +4,7 @@ import InputDataDecoder from 'ethereum-input-data-decoder';
 import { Button, Typography, Row, Col, Tag } from 'antd';
 
 import CsvLoader from '../../../components/CsvLoader';
+import DataTable from '../../../components/DataTable';
 
 import AirdropperABI from '../../../contracts/ABIs/airdropper.json';
 import { confirm, execute } from '../../../store/multisig/actions';
@@ -24,12 +25,26 @@ class TransactionCreation extends Component {
     csvData: [],
     sending: false,
     tx: {},
+    txData: {
+      addresses: [],
+      values: [],
+    },
   }
   componentDidMount() {
     const { match, transactions } = this.props;
     const id = match.params.id;
     const tx = transactions.find(item => item.id === Number(id));
-    this.setState({ tx });
+    const data = decoder.decodeData(tx && tx.data);
+    let addresses = [];
+    let values = [];
+    if (data.inputs[1]) {
+      addresses = data.inputs[1].map(item => '0x' + item.toLowerCase());
+      values = data.inputs[2].map(item => item.toString());
+    }
+    this.setState({
+      tx,
+      txData: { addresses, values },
+    });
   }
   setSending = bool => {
     this.setState({ sending: bool });
@@ -38,11 +53,7 @@ class TransactionCreation extends Component {
     this.setState({ csvData: data });
   }
   match = () => {
-    const transactionData = decoder.decodeData(this.state.tx && this.state.tx.data);
-    if (!transactionData.inputs[1]) return null;
-    const addresses = transactionData.inputs[1].map(item => '0x' + item.toLowerCase());
-    const values = transactionData.inputs[2].map(item => item.toString());
-
+    const { addresses, values } = this.state.txData;
     const recipientsAddresses = [];
     const recipientsShares = [];
     this.state.csvData.forEach(item => {
@@ -72,63 +83,74 @@ class TransactionCreation extends Component {
   }
   render() {
     const { owners, account, history } = this.props;
-    const { tx, sending } = this.state;
+    const { tx, sending, txData } = this.state;
     const isOwner = owners.includes(account);
     if (!isOwner) {
       history.push('/');
     }
-
-    if (tx.youConfirmed) {
-      let executeButton = null;
-      if (!tx.executed && tx.confirmationCount >= this.props.requiredConfirmationCount) {
-        executeButton = (
-          <Button
-            className="execute-button"
-            type="primary"
-            onClick={this.execute}
-            loading={sending}
-          >
-            Execute transaction
-          </Button>
-        );
-      }
-      return (
-        <div>
-          <Text>You have already confirmed the transaction</Text>
-          <Row>
-            {executeButton}
-          </Row>
-        </div>
-        
-      );
-    }
-
+    
     const match = this.match();
     const csvLoaded = this.state.csvData.length > 0;
+    let controls = null;
+
+    if (!tx.executed) {
+      if (tx.youConfirmed) {
+        let executeButton = null;
+        if (tx.confirmationCount >= this.props.requiredConfirmationCount) {
+          executeButton = (
+            <Button
+              className="execute-button"
+              type="primary"
+              onClick={this.execute}
+              loading={sending}
+            >
+              Execute transaction
+            </Button>
+          );
+        }
+        controls = (
+          <Row className="button-row" align="middle" type="flex" justify="space-between">
+            <Text>You have already confirmed the transaction</Text>
+            {executeButton}
+          </Row>
+          
+        );
+      } else {
+        controls = (
+          <Col>
+            <Text>Upload your CSV to compare with transaction data</Text>
+            <Row className="button-row" align="middle" type="flex" justify="space-between">
+              <Row align="middle" type="flex">
+                <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
+                <div className="status-badge">
+                  {csvLoaded ? (
+                    match ? (
+                      <Tag color="green">MATCH</Tag>
+                    ) : (
+                      <Tag color="red">NOT MATCH</Tag>
+                    )
+                  ) : (
+                    <Tag>NOT COMPARED</Tag>
+                  )}
+                </div>
+              </Row>
+              <Button
+                type="primary"
+                onClick={this.confirm}
+                loading={sending}
+              >
+                Confirm transaction
+              </Button>
+            </Row>
+          </Col>
+        );
+      }
+    }
+
     return (
       <Col>
-        <Text>Upload your CSV to compare with transaction data</Text>
-        <Row className="match-row" align="middle" type="flex">
-          <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
-          <div className="status-badge">
-            {csvLoaded ? (
-              match ? (
-                <Tag color="green">MATCH</Tag>
-              ) : (
-                <Tag color="red">NOT MATCH</Tag>
-              )
-            ) : (
-              <Tag>NOT VERIFIED</Tag>
-            )}
-          </div>
-        </Row>
-        <Button
-          type="primary"
-          onClick={this.confirm}
-          loading={sending}
-        >
-          Confirm transaction
-        </Button>
+        {controls}
+        <DataTable data={txData.addresses.map((item, index) => [item, txData.values[index]])} />
       </Col>
     );
   }
