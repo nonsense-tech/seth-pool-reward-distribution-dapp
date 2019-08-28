@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Icon, Button, Typography } from 'antd';
+import { Table, Icon, Button, Row } from 'antd';
 
 import './index.scss';
 
 const { Column } = Table;
-const { Text } = Typography;
 
 class TransactionList extends Component {
   render() {
@@ -14,15 +13,18 @@ class TransactionList extends Component {
     return (
       <div>
         {isOwner && (
-          <Button
-            className="create-button"
-            type="primary"
-            onClick={() => history.push('/transactions/create')}
-          >
-            Create a new transaction
-          </Button>
+          <Row type="flex" justify="end">
+            <Button
+              className="create-button"
+              type="primary"
+              onClick={() => history.push('/transactions/create')}
+            >
+              Create a new transaction
+            </Button>
+          </Row>
         )}
         <Table
+          size="small"
           rowClassName="table-row"
           dataSource={transactions.map((item, index) => ({
             key: index,
