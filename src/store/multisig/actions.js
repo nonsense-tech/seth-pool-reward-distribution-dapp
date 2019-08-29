@@ -87,21 +87,27 @@ export function create(data) {
   };
 }
 
-export function confirm(transactionId) {
+function confirmOrExecute(method, transactionId, txData) {
   return async (dispatch, getState) => {
     const instance = getState().multisig.instance;
-    const { account } = getState().web3connect;
-    await instance.methods.confirmTransaction(transactionId).send({ from: account });
+    const { web3, account } = getState().web3connect;
+    const airdropper = new web3.eth.Contract(AirdropperABI, addresses.airdropper);
+    const airdropperGas = await airdropper.methods.multisend(
+      addresses.token,
+      txData.addresses,
+      txData.values
+    ).estimateGas({ from: addresses.multisig });
+    const multisigGas = await instance.methods[method](transactionId).estimateGas({ from: account });
+    await instance.methods[method](transactionId).send({ from: account, gas: airdropperGas + multisigGas });
     dispatch(loadTransactions());
   };
 }
 
-export function execute(transactionId) {
-  return async (dispatch, getState) => {
-    const instance = getState().multisig.instance;
-    const { account } = getState().web3connect;
-    await instance.methods.executeTransaction(transactionId).send({ from: account });
-    dispatch(loadTransactions());
-  };
+export function confirm(transactionId, txData) {
+  return confirmOrExecute('confirmTransaction', transactionId, txData);
+}
+
+export function execute(transactionId, txData) {
+  return confirmOrExecute('executeTransaction', transactionId, txData);
 }
 

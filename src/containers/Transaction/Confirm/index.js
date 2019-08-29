@@ -77,11 +77,11 @@ class TransactionCreation extends Component {
     this.setSending(false);
   }
   confirm = () => {
-    const promise = this.props.confirm(this.props.match.params.id);
+    const promise = this.props.confirm(this.props.match.params.id, this.state.txData);
     this.call(promise);
   }
   execute = () => {
-    const promise = this.props.execute(this.props.match.params.id);
+    const promise = this.props.execute(this.props.match.params.id, this.state.txData);
     this.call(promise);
   }
   render() {
