@@ -1,1 +1,7 @@
-# seth-distribution-app
+# SETH Pool Reward Distribution DApp
+
+## Run:
+```
+yarn
+yarn start
+```
