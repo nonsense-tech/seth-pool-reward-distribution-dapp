@@ -138,6 +138,7 @@ class TransactionCreation extends Component {
                 type="primary"
                 onClick={this.confirm}
                 loading={sending}
+                disabled={csvLoaded && !match}
               >
                 Confirm transaction
               </Button>
