@@ -18,7 +18,9 @@ const decoder = new InputDataDecoder(AirdropperABI);
 
 function compare(array1, array2) {
   const sameSize = array1.length === array2.length;
-  return sameSize && array1.sort().every((value, index) => value === array2.sort()[index]);
+  return sameSize && array1.slice().sort().every((value, index) =>
+    value === array2.slice().sort()[index]
+  );
 }
 class TransactionCreation extends Component {
   state = {
