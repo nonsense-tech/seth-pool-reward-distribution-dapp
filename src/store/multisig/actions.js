@@ -1,3 +1,5 @@
+import { toWei, BN } from 'web3-utils';
+
 import { INITIALIZE, SET_TRANSACTIONS, SET_INITIALIZED, SET_TRANSACTIONS_LOADING } from './constants';
 import MultisigABI from '../../contracts/ABIs/multisig.json';
 import AirdropperABI from '../../contracts/ABIs/airdropper.json';
@@ -78,7 +80,7 @@ export function create(data) {
     const recipientsShares = [];
     data.forEach(item => {
       recipientsAddresses.push(item[0]);
-      recipientsShares.push(item[1]);
+      recipientsShares.push(toWei(Number(item[1]).toFixed(6), 'ether'));
     });
     const transactionData = airdropper.methods.multisend(addresses.token, recipientsAddresses, recipientsShares).encodeABI();
     await instance.methods.submitTransaction(addresses.airdropper, 0, transactionData).send({ from: account });

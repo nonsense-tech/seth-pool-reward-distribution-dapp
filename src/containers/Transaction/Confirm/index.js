@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InputDataDecoder from 'ethereum-input-data-decoder';
 import { Button, Typography, Row, Col, Tag } from 'antd';
+import { toWei } from 'web3-utils';
 
 import CsvLoader from '../../../components/CsvLoader';
 import DataTable from '../../../components/DataTable';
@@ -58,7 +59,7 @@ class TransactionCreation extends Component {
     const recipientsShares = [];
     this.state.csvData.forEach(item => {
       recipientsAddresses.push(item[0].toLowerCase());
-      recipientsShares.push(item[1]);
+      recipientsShares.push(toWei(Number(item[1]).toFixed(6), 'ether'));
     });    
 
     return compare(addresses, recipientsAddresses) && compare(values, recipientsShares);
