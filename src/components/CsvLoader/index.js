@@ -48,7 +48,7 @@ class CsvLoader extends Component {
         disabled={this.props.disabled}
       >
         <Button>
-          <Icon type="upload" /> Upload CSV
+          <Icon type="upload" /> Select a CSV file
         </Button>
       </Upload>
     );

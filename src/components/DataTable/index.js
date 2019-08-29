@@ -18,7 +18,7 @@ class DataTable extends Component {
             dataIndex: 'address',
           },
           {
-            title: 'Value',
+            title: 'Reward, SNX',
             dataIndex: 'value',
           }
         ]}

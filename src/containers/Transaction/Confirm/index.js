@@ -110,7 +110,7 @@ class TransactionCreation extends Component {
         }
         controls = (
           <Row className="button-row" align="middle" type="flex" justify="space-between">
-            <Text>You have already confirmed the transaction</Text>
+            <Text>You've confirmed this transaction already</Text>
             {executeButton}
           </Row>
           
@@ -118,19 +118,19 @@ class TransactionCreation extends Component {
       } else {
         controls = (
           <Col>
-            <Text>Upload your CSV to compare with transaction data</Text>
+            <Text>Select a CSV file you've created by the validation script to compare it with the transaction payload</Text>
             <Row className="button-row" align="middle" type="flex" justify="space-between">
               <Row align="middle" type="flex">
                 <CsvLoader onDataLoaded={this.onDataLoaded} disabled={sending} />
                 <div className="status-badge">
                   {csvLoaded ? (
                     match ? (
-                      <Tag color="green">MATCH</Tag>
+                      <Tag color="green">PAYLOAD IS VALID</Tag>
                     ) : (
-                      <Tag color="red">NOT MATCH</Tag>
+                      <Tag color="red">PAYLOAD IS NOT VALID</Tag>
                     )
                   ) : (
-                    <Tag>NOT COMPARED</Tag>
+                    <Tag>NO FILE SELECTED</Tag>
                   )}
                 </div>
               </Row>
@@ -140,7 +140,7 @@ class TransactionCreation extends Component {
                 loading={sending}
                 disabled={csvLoaded && !match}
               >
-                Confirm transaction
+                Confirm the transaction
               </Button>
             </Row>
           </Col>
