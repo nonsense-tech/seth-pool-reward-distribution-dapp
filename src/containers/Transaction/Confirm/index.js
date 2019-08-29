@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InputDataDecoder from 'ethereum-input-data-decoder';
 import { Button, Typography, Row, Col, Tag } from 'antd';
-import { toWei } from 'web3-utils';
+import { toWei, fromWei } from 'web3-utils';
 
 import CsvLoader from '../../../components/CsvLoader';
 import DataTable from '../../../components/DataTable';
@@ -150,7 +150,7 @@ class TransactionCreation extends Component {
     return (
       <Col>
         {controls}
-        <DataTable data={txData.addresses.map((item, index) => [item, txData.values[index]])} />
+        <DataTable data={txData.addresses.map((item, index) => [item, fromWei(txData.values[index])])} />
       </Col>
     );
   }
