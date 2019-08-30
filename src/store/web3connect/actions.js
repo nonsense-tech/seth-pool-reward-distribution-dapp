@@ -1,8 +1,17 @@
 import Web3 from 'web3';
 import { fromWei } from 'web3-utils';
 
-import { INITIALIZE, CHANGE_ACCOUNT } from './constants';
+import { INITIALIZE, CHANGE_ACCOUNT, SET_GLOBAL_LOADING } from './constants';
 import { initialize as initializeMultisig, loadTransactions } from '../multisig/actions';
+
+export function setGlobalLoading(bool) {
+  return dispatch => {
+    dispatch({
+      type: SET_GLOBAL_LOADING,
+      data: { globalLoading: bool }
+    });
+  }
+}
 
 export function initialize() {
   return async dispatch => {
@@ -30,7 +39,9 @@ export function initialize() {
               account: currentAccount,
             }
           });
-          dispatch(loadTransactions());
+          dispatch(setGlobalLoading(true));
+          await dispatch(loadTransactions());
+          dispatch(setGlobalLoading(false));
         }
       });
       

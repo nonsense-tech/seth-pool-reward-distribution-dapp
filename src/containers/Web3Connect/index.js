@@ -15,10 +15,10 @@ class Web3Connect extends Component {
     const {
       web3Initialized,
       multisigInitialized,
-      transactionsLoading,
+      globalLoading,
       children,
     } = this.props;
-    if (!web3Initialized || !multisigInitialized || transactionsLoading) {
+    if (!web3Initialized || !multisigInitialized || globalLoading) {
       return <Spin size="large" className="spin" />;
     }
     return children;
@@ -29,7 +29,7 @@ export default connect(
   state => ({
     web3Initialized: state.web3connect.initialized,
     multisigInitialized: state.multisig.initialized,
-    transactionsLoading: state.multisig.loading,
+    globalLoading: state.web3connect.globalLoading,
   }),
   { initialize }
 )(Web3Connect);
