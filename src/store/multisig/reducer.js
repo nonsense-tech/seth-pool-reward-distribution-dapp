@@ -6,7 +6,7 @@ const initState = {
   transactions: [],
   requiredConfirmationCount: 0,
   initialized: false,
-  loading: false,
+  transactionsLoading: false,
 };
 
 export default function(state = initState, { type, data }) {
@@ -20,8 +20,7 @@ export default function(state = initState, { type, data }) {
       const { transactions } = data;
       return { ...state, transactions };
     case SET_TRANSACTIONS_LOADING:
-      const { loading } = data;
-      return { ...state, loading };
+      return { ...state, transactionsLoading: data.transactionsLoading };
     default:
       return state;
   }

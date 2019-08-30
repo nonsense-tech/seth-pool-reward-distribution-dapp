@@ -3,17 +3,28 @@ import { connect } from 'react-redux';
 import { Table, Icon, Button, Row } from 'antd';
 
 import './index.scss';
+import { loadTransactions } from '../../../store/multisig/actions';
 
 const { Column } = Table;
 
 class TransactionList extends Component {
   render() {
-    const { owners, account, history, transactions, requiredConfirmationCount } = this.props;
+    const {
+      owners,
+      account,
+      history,
+      transactions,
+      requiredConfirmationCount,
+      transactionsLoading
+    } = this.props;
     const isOwner = owners.includes(account);
     return (
       <div>
-        {isOwner && (
-          <Row type="flex" justify="end">
+        <Row type="flex" justify="end" className="button-row">
+          <Button onClick={this.props.loadTransactions}>
+            <Icon type="reload" /> Refresh
+          </Button>
+          {isOwner && (
             <Button
               className="create-button"
               type="primary"
@@ -21,8 +32,8 @@ class TransactionList extends Component {
             >
               Create a new transaction
             </Button>
-          </Row>
-        )}
+          )}
+        </Row>
         <Table
           size="small"
           rowClassName="table-row"
@@ -48,6 +59,7 @@ class TransactionList extends Component {
             ),
           }))}
           onRow={(item) => ({ onClick: () => history.push(`/transactions/${item.transactionId}`) })}
+          loading={transactionsLoading}
         >
           <Column title="ID" dataIndex="transactionId" align="center" />
           <Column title="Confirmations" dataIndex="confirmations" align="center" />
@@ -63,5 +75,6 @@ export default connect(
   state => ({
     ...state.multisig,
     account: state.web3connect.account,
-  })
+  }),
+  { loadTransactions }
 )(TransactionList);

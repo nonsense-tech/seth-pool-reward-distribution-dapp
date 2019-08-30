@@ -25,14 +25,19 @@ export function initialize() {
   };
 }
 
-export function loadTransactions() {
-  return async (dispatch, getState) => {
+export function setTransactionsLoading(bool) {
+  return dispatch => {
     dispatch({
       type: SET_TRANSACTIONS_LOADING,
-      data: { 
-        loading: true,
-      },
+      data: { transactionsLoading: bool }
     });
+  }
+}
+
+
+export function loadTransactions() {
+  return async (dispatch, getState) => {
+    dispatch(setTransactionsLoading(true));
     const { web3, account } = getState().web3connect;
     const instance = new web3.eth.Contract(MultisigABI, addresses.multisig);
 
@@ -61,12 +66,7 @@ export function loadTransactions() {
       type: SET_TRANSACTIONS,
       data: { transactions },
     });
-    dispatch({
-      type: SET_TRANSACTIONS_LOADING,
-      data: { 
-        loading: false,
-      },
-    });
+    dispatch(setTransactionsLoading(false));
   }
 }
 
